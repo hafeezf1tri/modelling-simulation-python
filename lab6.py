@@ -1,7 +1,4 @@
-def my_generator():
-  yield 1
-  yield 2
-  yield 3
+squares = (x*x for x in range(5))
 
-for value in my_generator():
-  print(value) 
+for value in squares:
+    print(value)

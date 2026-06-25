@@ -2,7 +2,7 @@ import simpy
 
 def student(env):
     print('Start studying at', env.now)
-    yield env.timeout(5)
+    yield env.timeout(2)
     print('Take a break at', env.now)
 
 env = simpy.Environment()

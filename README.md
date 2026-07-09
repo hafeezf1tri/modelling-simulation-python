@@ -56,14 +56,15 @@ pip install -r requirements.txt
 ## Running the Labs
 
 Run any lab file with Python:
-
+Example:
 ```bash
 python lab6.py
-python lab6-1.py
-python lab6-2.py
-python lab6-task2.py
-python lab6tasksubmission.py
-python lab7tasksubmission.py
+```
+
+To run the SimPy clinic simulation lab:
+
+```bash
+python lab8.py
 ```
 
 ## Lab Topics
@@ -76,13 +77,13 @@ The current lab files cover:
 - Iterating through generated values
 - Simple task submissions using Python functions
 
-Future SimPy labs may include:
+Current SimPy labs include:
 
 - Creating a simulation environment
-- Modeling processes
+- Modeling patient processes
 - Using timeouts and events
-- Simulating queues and resources
-- Collecting and displaying simulation results
+- Simulating a doctor resource queue
+- Showing patient arrival, consultation start, and clinic departure
 
 ## Example SimPy Program
 

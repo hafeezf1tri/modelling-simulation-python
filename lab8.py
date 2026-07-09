@@ -2,34 +2,46 @@ import random
 import simpy
 
 
-def patient(env, name, doctor):
-    arrival_time = env.now
-    print(f"{name} arrived at time {arrival_time}")
+def patient(env, name, counter, wait_times):
+    arrival = env.now
+    print(f"{name} arrived at time {arrival}")
 
-    with doctor.request() as request:
-        yield request
+    with counter.request() as req:
+        yield req
 
         service_start = env.now
-        waiting_time = service_start - arrival_time
+        wait = env.now - arrival
+        wait_times.append(wait)
 
         print(f"{name} started consultation at time {service_start}")
-        print(f"{name} waited for {waiting_time} minutes")
+        print(f"{name} waited for {wait} minutes")
 
-        consultation_time = random.randint(4, 8)
-        yield env.timeout(consultation_time)
+        service = random.randint(3, 7)
+        yield env.timeout(service)
         print(f"{name} finished consultation at time {env.now}")
         print(f"{name} left clinic at time {env.now}")
 
 
-def patient_generator(env, doctor):
-    for i in range(5):
-        env.process(patient(env, f"Patient {i + 1}", doctor))
+def patient_generator(env, counter, wait_times):
+    for i in range(10):
+        env.process(patient(env, f"Patient {i + 1}", counter, wait_times))
         arrival_gap = random.randint(1, 4)
         yield env.timeout(arrival_gap)
 
 
-env = simpy.Environment()
-doctor = simpy.Resource(env, capacity=2)
+def run_simulation(num_counters):
+    env = simpy.Environment()
+    counter = simpy.Resource(env, capacity=num_counters)
+    wait_times = []
 
-env.process(patient_generator(env, doctor))
-env.run()
+    env.process(patient_generator(env, counter, wait_times))
+    env.run()
+
+    return sum(wait_times) / len(wait_times)
+
+
+avg_1 = run_simulation(1)
+avg_2 = run_simulation(2)
+
+print(f"Average wait with 1 counter: {avg_1}")
+print(f"Average wait with 2 counters: {avg_2}")

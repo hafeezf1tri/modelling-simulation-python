@@ -2,18 +2,22 @@ import random
 import simpy
 
 
-def patient(env, name, counter, wait_times):
+def patient(env, name, counter, priority, patient_type, normal_waits, urgent_waits):
     arrival = env.now
-    print(f"{name} arrived at time {arrival}")
+    print(f"{name} ({patient_type}) arrived at time {arrival}")
 
-    with counter.request() as req:
+    with counter.request(priority=priority) as req:
         yield req
 
         service_start = env.now
         wait = env.now - arrival
-        wait_times.append(wait)
 
-        print(f"{name} started consultation at time {service_start}")
+        if patient_type == "urgent":
+            urgent_waits.append(wait)
+        else:
+            normal_waits.append(wait)
+
+        print(f"{name} ({patient_type}) started consultation at time {service_start}")
         print(f"{name} waited for {wait} minutes")
 
         service = random.randint(3, 7)
@@ -22,26 +26,46 @@ def patient(env, name, counter, wait_times):
         print(f"{name} left clinic at time {env.now}")
 
 
-def patient_generator(env, counter, wait_times):
-    for i in range(10):
-        env.process(patient(env, f"Patient {i + 1}", counter, wait_times))
+def patient_generator(env, counter, normal_waits, urgent_waits):
+    for i in range(1, 21):
+        if i % 5 == 0:
+            priority = 1
+            patient_type = "urgent"
+        else:
+            priority = 2
+            patient_type = "normal"
+
+        env.process(
+            patient(
+                env,
+                f"Patient {i}",
+                counter,
+                priority,
+                patient_type,
+                normal_waits,
+                urgent_waits,
+            )
+        )
         arrival_gap = random.randint(1, 4)
         yield env.timeout(arrival_gap)
 
 
 def run_simulation(num_counters):
     env = simpy.Environment()
-    counter = simpy.Resource(env, capacity=num_counters)
-    wait_times = []
+    counter = simpy.PriorityResource(env, capacity=num_counters)
+    normal_waits = []
+    urgent_waits = []
 
-    env.process(patient_generator(env, counter, wait_times))
+    env.process(patient_generator(env, counter, normal_waits, urgent_waits))
     env.run()
 
-    return sum(wait_times) / len(wait_times)
+    normal_avg = sum(normal_waits) / len(normal_waits)
+    urgent_avg = sum(urgent_waits) / len(urgent_waits)
+
+    return normal_avg, urgent_avg
 
 
-avg_1 = run_simulation(1)
-avg_2 = run_simulation(2)
+normal_avg, urgent_avg = run_simulation(1)
 
-print(f"Average wait with 1 counter: {avg_1}")
-print(f"Average wait with 2 counters: {avg_2}")
+print(f"Average normal patient wait: {normal_avg}")
+print(f"Average urgent patient wait: {urgent_avg}")

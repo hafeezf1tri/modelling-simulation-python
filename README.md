@@ -113,4 +113,3 @@ python filename.py
 - Keep each lab task in a separate file unless instructed otherwise.
 - Use clear function names and readable output.
 - Update `requirements.txt` when new packages are added.
-- Do not commit the `.venv` folder.

@@ -15,3 +15,6 @@ print_options = pymunk.SpaceDebugDrawOptions()
 for _ in range(100):
     space.step(0.1)
     space.debug_draw(print_options)
+
+
+

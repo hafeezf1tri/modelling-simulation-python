@@ -21,6 +21,8 @@ floor.elasticity = 0.9
 floor.friction = 0.8
 space.add(floor)
 
+STARTING_POSITIONS = [(200, 150), (400, 100), (600, 100)]
+
 
 def create_ball(position):
     mass = 1
@@ -29,6 +31,7 @@ def create_ball(position):
 
     body = pymunk.Body(mass, moment)
     body.position = position
+    body.velocity = (0, 0)
 
     ball = pymunk.Circle(body, radius)
     ball.elasticity = 0.9
@@ -37,7 +40,7 @@ def create_ball(position):
     space.add(body, ball)
 
 
-for start_position in [(200, 100), (400, 100), (600, 100)]:
+for start_position in STARTING_POSITIONS:
     create_ball(start_position)
 
 draw_options = pymunk.pygame_util.DrawOptions(screen)
